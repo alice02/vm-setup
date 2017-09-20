@@ -1,0 +1,50 @@
+---
+
+- name: Git clone anyenv
+  git: repo="https://github.com/riywo/anyenv" dest="~/.anyenv"
+
+- name: Install pyenv, rbenv, ndenv, goenv
+  shell: >
+    eval "$(anyenv init -)";
+    anyenv install -f {{ item }}
+  environment:
+    PATH: "~/.anyenv/bin:{{ lookup('env', 'PATH') }}"
+  with_items:
+    - pyenv
+    - rbenv
+    - ndenv
+    - goenv
+
+- name: Install python build deps
+  apt: name={{ item }} state=latest update_cache=yes
+  become: yes
+  with_items:
+    - zlib1g-dev
+    - libssl-dev
+    - libbz2-dev
+    - libreadline-dev
+    - libsqlite3-dev
+
+- name: Install python 3.6.2
+  shell: >
+    eval "$(anyenv init -)";
+    pyenv install 3.6.2;
+    pyenv global 3.6.2
+
+- name: Install Ruby 2.4.1
+  shell: >
+    eval "$(anyenv init -)";
+    rbenv install 2.4.1;
+    rbenv global 2.4.1
+
+- name: Install Nodejs 6.11.2
+  shell: >
+    eval "$(anyenv init -)";
+    ndenv install 6.11.2;
+    ndenv global 6.11.2
+
+- name: Install Golang 1.9
+  shell: >
+    eval "$(anyenv init -)";
+    goenv install 1.9;
+    goenv global 1.9

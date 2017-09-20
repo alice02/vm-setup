@@ -1,0 +1,78 @@
+---
+
+- name: Install apt packages
+  apt: name={{ item }} state=latest update_cache=yes
+  become: yes
+  with_items:
+    - zsh
+    - tmux
+    - vim
+    - git
+    - git-flow
+    - curl
+    - wget
+    - jq
+    - unzip
+    - tig
+    - build-essential
+
+- name: Configure git username
+  shell: "git config --global user.name {{ git_user }}"
+
+- name: Configure git email
+  shell: "git config --global user.email {{ git_email }}"
+
+- name: Fetch peco
+  get_url: url=https://github.com/peco/peco/releases/download/v0.5.1/peco_linux_amd64.tar.gz dest=/tmp/peco.tar.gz
+
+- name: Unarchive peco
+  unarchive: src=/tmp/peco.tar.gz dest=/tmp
+
+- name: Install peco
+  copy: src=/tmp/peco_linux_amd64/peco dest=/usr/local/bin/peco mode=755
+  become: yes
+
+- name: Fetch ghq
+  get_url: url=https://github.com/motemen/ghq/releases/download/v0.8.0/ghq_linux_amd64.zip dest=/tmp/ghq.zip
+
+- name: Unarchive ghq
+  unarchive: src=/tmp/ghq.zip dest=/tmp/
+
+- name: Install ghq
+  copy: src=/tmp/ghq dest=/usr/local/bin mode=755
+  become: yes
+
+- name: Configure ghq
+  shell: "git config --global ghq.root ~/src"
+
+- name: Clone oh-my-zsh
+  git: repo=https://github.com/robbyrussell/oh-my-zsh dest=~/.oh-my-zsh
+
+- name: Create ~/.zshrc from template
+  copy: src=~/.oh-my-zsh/templates/zshrc.zsh-template dest=~/.zshrc
+
+- name: Configure oh-my-zsh theme
+  lineinfile: >-
+    dest=~/.zshrc
+    state=present
+    regexp='^ZSH_THEME='
+    line='ZSH_THEME="steeef"'
+
+- name: Configure oh-my-zsh plugins
+  lineinfile: >-
+    dest=~/.zshrc
+    state=present
+    regexp='^plugins='
+    line='plugins=(git docker python ruby pyenv git-flow npm pip gem)'
+
+- name: Clone dotfiles
+  git: repo=https://github.com/alice02/dotfiles.git dest=~/.dotfiles
+
+- name: Set custom keybinding definition for oh-my-zsh
+  file: src=~/.dotfiles/oh-my-zsh/custom/keybind.zsh dest=~/.oh-my-zsh/custom/keybind.zsh state=link
+
+- name: Set custom environment variables definition for oh-my-zsh
+  file: src=~/.dotfiles/oh-my-zsh/custom/env.zsh dest=~/.oh-my-zsh/custom/env.zsh state=link
+
+- name: Set custom tmux config
+  file: src=~/.dotfiles/tmux.conf dest=~/.tmux.conf state=link

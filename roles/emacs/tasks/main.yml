@@ -1,0 +1,29 @@
+---
+
+- name: Add emacs25 apt repository
+  apt_repository: repo="ppa:ubuntu-elisp/ppa"
+  become: yes
+
+- name: Install emacs25
+  apt: name=emacs25-nox state=latest update_cache=yes
+  become: yes
+
+- name: Check ~/.cask exists
+  stat: path="~/.cask"
+  register: cask_dir
+
+- name: Install Cask
+  shell: "curl -fsSL https://raw.githubusercontent.com/cask/cask/master/go | python"
+  when: not cask_dir.stat.exists
+
+- name: Create ~/.emacs.d
+  file: path=~/.emacs.d state=directory
+
+- name: Set Cask file symlink
+  file: src=~/.dotfiles/emacs.d/Cask dest=~/.emacs.d/Cask state=link
+
+- name: Set init.el symlink
+  file: src=~/.dotfiles/emacs.d/init.el dest=~/.emacs.d/init.el state=link
+
+- name: Install emacs packages using cask
+  shell: "cd ~/.emacs.d && ~/.cask/bin/cask install"
