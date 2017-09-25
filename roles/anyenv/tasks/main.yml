@@ -25,26 +25,54 @@
     - libreadline-dev
     - libsqlite3-dev
 
+- name: Check python installed
+  stat: path=~/.anyenv/envs/pyenv/versions/3.6.2
+  register: python_dir
+
 - name: Install python 3.6.2
   shell: >
-    eval "$(anyenv init -)";
-    pyenv install 3.6.2;
+    source ~/.zshrc &&
+    pyenv install 3.6.2 &&
     pyenv global 3.6.2
+  args:
+    executable: /usr/bin/zsh
+  when: not python_dir.stat.exists
+
+- name: Check ruby installed
+  stat: path=~/.anyenv/envs/rbenv/versions/2.4.1
+  register: ruby_dir
 
 - name: Install Ruby 2.4.1
   shell: >
-    eval "$(anyenv init -)";
-    rbenv install 2.4.1;
+    source ~/.zshrc &&
+    rbenv install 2.4.1 &&
     rbenv global 2.4.1
+  args:
+    executable: /usr/bin/zsh
+  when: not ruby_dir.stat.exists
+
+- name: Check nodejs installed
+  stat: path=~/.anyenv/envs/ndenv/versions/6.11.2
+  register: nodejs_dir
 
 - name: Install Nodejs 6.11.2
   shell: >
-    eval "$(anyenv init -)";
-    ndenv install 6.11.2;
+    source ~/.zshrc &&
+    ndenv install 6.11.2 &&
     ndenv global 6.11.2
+  args:
+    executable: /usr/bin/zsh
+  when: not nodejs_dir.stat.exists
+
+- name: Check golang installed
+  stat: path=~/.anyenv/envs/goenv/versions/1.9
+  register: golang_dir
 
 - name: Install Golang 1.9
   shell: >
-    eval "$(anyenv init -)";
-    goenv install 1.9;
+    source ~/.zshrc &&
+    goenv install 1.9 &&
     goenv global 1.9
+  args:
+    executable: /usr/bin/zsh
+  when: not golang_dir.stat.exists
