@@ -26,4 +26,4 @@
   file: src=~/.dotfiles/emacs.d/init.el dest=~/.emacs.d/init.el state=link
 
 - name: Install emacs packages using cask
-  shell: "cd ~/.emacs.d && ~/.cask/bin/cask install"
+  shell: "cd ~/.emacs.d && ~/.cask/bin/cask update && ~/.cask/bin/cask install"
