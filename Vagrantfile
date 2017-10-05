@@ -60,6 +60,10 @@ Vagrant.configure("2") do |config|
   #
   # View the documentation for the provider you are using for more
   # information on available options.
+  if Vagrant.has_plugin?("vagrant-rlogin")
+    config.rlogin.exe_path = 'C:\Users\Kouta\apps\RLogin\RLogin.exe'
+    config.rlogin.config_path = 'rlogin.rlg'
+  end
 
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
